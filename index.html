@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fab Calc</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#14181f;--mu:#667085;--ac:#e8590c;--bd:#e1e4ea;--ok:#0b7a43;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151a;--card:#1c2028;--tx:#eef1f6;--mu:#9aa3b2;--ac:#ff8a4c;--bd:#2c323d;--ok:#4cd694}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:480px;margin:0 auto;padding:16px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+h1{font-size:20px;margin:0}
+#unit{width:80px;font-size:16px;padding:6px 8px;text-align:center}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
+.tabs button{padding:12px 0;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font-size:15px;font-weight:600}
+.tabs button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+input{width:100%;font-size:20px;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.row:last-child{border:0}
+.row span{color:var(--mu);font-size:14px}
+.row b{font-size:20px;color:var(--ok)}
+.chips{display:flex;gap:8px;margin-top:10px}
+.chips button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:16px}
+.note{font-size:12px;color:var(--mu);text-align:center}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><h1>Fab Calc</h1><input id="unit" value="cm" aria-label="unit"></div>
+<div class="tabs" id="tabs"></div>
+<div class="card" id="inputs"></div>
+<div class="card" id="draw" style="display:none"></div>
+<div class="card" id="results"></div>
+<p class="note" id="note"></p>
+</main>
+<script>
+const S2=Math.SQRT2,PI=Math.PI,rad=x=>x*PI/180,deg=x=>x*180/PI;
+const f=n=>isFinite(n)?String(+n.toFixed(2)):'—';
+const U=()=>unit.value||'';
+const V=n=>f(n)+' '+U();
+const tx=(x,y,s,a='middle',c='var(--ac)')=>`<text x="${x}" y="${y}" text-anchor="${a}" fill="${c}" font-size="13" font-weight="700" stroke="var(--card)" stroke-width="3" paint-order="stroke">${s}</text>`;
+const ln=(a,b,c,d,w=2,dash='',col='currentColor')=>`<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="${col}" stroke-width="${w}"${dash?` stroke-dasharray="${dash}"`:''} stroke-linecap="round"/>`;
+const wrap=s=>`<svg viewBox="0 0 300 220" style="width:100%;color:var(--tx)">${s}</svg>`;
+const T={
+'L 90°':{in:[['a','Side A (vertical)'],['b','Side B (horizontal)']],req:['a','b'],
+ calc:v=>({tot:v.a+v.b,c:Math.hypot(v.a,v.b),rect:v.a*v.b,tri:v.a*v.b/2,aB:deg(Math.atan(v.a/v.b)),aA:deg(Math.atan(v.b/v.a))}),
+ out:[['tot','Total length A + B'],['c','Diagonal (slant)'],['rect','A × B'],['tri','Triangle area (A×B÷2)'],['aB','Angle at B end','°'],['aA','Angle at A end','°']],
+ draw:(v,r)=>{const sc=Math.min(200/v.b,140/v.a),W=v.b*sc,H=v.a*sc,x=150-W/2,yb=105+H/2,yt=yb-H;
+  return `<polyline points="${x},${yt} ${x},${yb} ${x+W},${yb}" fill="none" stroke="var(--ac)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>`+ln(x,yt,x+W,yb,1.5,'5 4','var(--mu)')+`<polyline points="${x+12},${yb} ${x+12},${yb-12} ${x},${yb-12}" fill="none" stroke="currentColor"/>`+
+  tx(x-8,yb-H/2+4,V(v.a),'end')+tx(x+W/2,yb+20,V(v.b))+tx(x+W/2+10,yb-H/2-8,V(r.c),'start','currentColor')+tx(x+W-6,yb-8,f(r.aB)+'°','end','currentColor')+tx(x+16,yb-16,'90°','start','currentColor')}},
+'Offset':{in:[['o','Offset (rise)'],['t','Travel (slant length)'],['e','Fitting take-off (each end)'],['a','Angle (°)']],link:['o','t'],extra:['a'],preset:[30,45,60],def:45,
+ calc:(v,l)=>{const s=Math.sin(rad(v.a)),o=l==='t'?v.t*s:v.o,e=v.e||0,t=o/s;return{o,t,cut:t-2*e,run:o/Math.tan(rad(v.a))}},
+ out:[['cut','Cut pipe length'],['run','Run (straight distance)']],
+ draw:(v,r)=>{const sc=Math.min(190/r.run,130/r.o),W=r.run*sc,H=r.o*sc,x=150-W/2,yb=105+H/2;
+  return ln(x,yb,x+W,yb,1.5,'5 4','var(--mu)')+ln(x+W,yb,x+W,yb-H,1.5,'5 4','var(--mu)')+ln(x,yb,x+W,yb-H,6,'','var(--ac)')+
+  tx(x+W/2,yb+20,'Run '+V(r.run))+tx(x+W-8,yb-H/2+4,'Offset '+V(r.o),'end')+tx(x+W/2-8,yb-H/2-8,'Travel '+V(r.t),'end','currentColor')+tx(x+32,yb-6,v.a+'°','start','currentColor')},
+ note:'Travel = Offset ÷ sin(angle), Run = Offset ÷ tan(angle)'},
+'Bend':{in:[['r','Centerline radius R'],['a','Bend angle (°)'],['d','Pipe OD']],req:['r','a'],preset:[30,45,60,90],def:90,
+ calc:v=>{const R=v.r,a=v.a,d=v.d||0;return{arc:rad(a)*R,tan:R*Math.tan(rad(a/2)),ch:2*R*Math.sin(rad(a/2)),outer:rad(a)*(R+d/2),inner:rad(a)*(R-d/2)}},
+ out:[['arc','Arc length (centerline)'],['outer','Outer arc'],['inner','Inner arc'],['tan','Tangent length'],['ch','Chord length']],
+ draw:(v,r)=>{const cx=50,cy=195,R=110,t=rad(v.a),ex=cx+R*Math.cos(t),ey=cy-R*Math.sin(t),m=t/2,mx=cx+(R+14)*Math.cos(m),my=cy-(R+14)*Math.sin(m);
+  return `<path d="M${cx+R} ${cy} A${R} ${R} 0 ${v.a>180?1:0} 0 ${ex} ${ey}" fill="none" stroke="var(--ac)" stroke-width="6" stroke-linecap="round"/>`+ln(cx,cy,cx+R,cy,1.5,'5 4','var(--mu)')+ln(cx,cy,ex,ey,1.5,'5 4','var(--mu)')+
+  tx(cx+R/2,cy+17,'R '+V(v.r),'middle','currentColor')+tx(cx+30,cy-10,v.a+'°','start','currentColor')+tx(mx,my,'Arc '+V(r.arc),'start')}},
+'Round':{in:[['d','Diameter'],['r','Radius'],['c','Circumference'],['a','Area']],link:['d','r','c','a'],
+ calc:(v,l)=>{const d=l==='r'?2*v.r:l==='c'?v.c/PI:l==='a'?2*Math.sqrt(v.a/PI):v.d;return{d,r:d/2,c:PI*d,a:PI*d*d/4,sq:d/S2}},
+ out:[['sq','Biggest square inside']],
+ draw:(v,r)=>`<circle cx="150" cy="95" r="75" fill="none" stroke="var(--ac)" stroke-width="6"/>`+ln(75,95,225,95,1.5,'5 4','var(--mu)')+ln(150,95,150,20,1.5,'5 4','var(--mu)')+
+  tx(150,115,'Ø '+V(r.d))+tx(156,62,'R '+V(r.r),'start','currentColor')+tx(150,194,'Circumference '+V(r.c),'middle','currentColor')+tx(150,212,'Area '+f(r.a)+' '+U()+'²','middle','currentColor')},
+'Square':{in:[['s','Side'],['g','Diagonal'],['p','Perimeter'],['a','Area']],link:['s','g','p','a'],
+ calc:(v,l)=>{const s=l==='g'?v.g/S2:l==='p'?v.p/4:l==='a'?Math.sqrt(v.a):v.s;return{s,g:s*S2,p:4*s,a:s*s,c:s*S2}},
+ out:[['c','Circle outside square (dia)'],['s','Circle inside square (dia)']],
+ draw:(v,r)=>{const x=100,y=35,S=110;return `<rect x="${x}" y="${y}" width="${S}" height="${S}" fill="none" stroke="var(--ac)" stroke-width="6" stroke-linejoin="round"/>`+ln(x,y,x+S,y+S,1.5,'5 4','var(--mu)')+
+  tx(x+S/2,y-8,V(r.s))+tx(x+S/2,y+S+19,V(r.s))+tx(x-8,y+S/2+4,V(r.s),'end')+tx(x+S+8,y+S/2+4,V(r.s),'start')+tx(x+S/2+8,y+S/2-14,V(r.g),'start','currentColor')+
+  tx(150,198,'Perimeter '+V(r.p),'middle','currentColor')+tx(150,214,'Area '+f(r.a)+' '+U()+'²','middle','currentColor')}},
+'Sq→Round':{in:[['s','Square side'],['d','Round diameter'],['h','Height']],req:['s','d','h'],
+ calc:v=>{const r=v.d/2;return{corner:Math.hypot(v.h,v.s/S2-r),mid:Math.hypot(v.h,v.s/2-r),q:PI*v.d/4,c:PI*v.d,p:4*v.s}},
+ out:[['corner','Corner edge length'],['mid','Mid-side edge length'],['q','Round quarter arc'],['c','Round circumference'],['p','Square perimeter']],
+ draw:(v,r)=>{const sc=150/Math.max(v.s,v.d),S=v.s*sc,D=v.d*sc,cx=150,cy=100,k=D/2*0.7071,sx=cx+S/2,sy=cy-S/2;
+  return `<rect x="${cx-S/2}" y="${cy-S/2}" width="${S}" height="${S}" fill="none" stroke="var(--ac)" stroke-width="5"/><circle cx="${cx}" cy="${cy}" r="${D/2}" fill="none" stroke="currentColor" stroke-width="3"/>`+
+  ln(sx,sy,cx+k,cy-k,2,'4 3','var(--ok)')+ln(sx,cy,cx+D/2,cy,2,'4 3','var(--ok)')+ln(cx-D/2,cy,cx+D/2,cy,1,'4 3','var(--mu)')+
+  tx(cx,cy-S/2-8,'Square '+V(v.s))+tx(cx-D/2+4,cy+16,'Ø '+V(v.d),'start','currentColor')+tx(sx+4,sy-6+(cy-k-sy)/2,'Corner '+V(r.corner),'start','var(--ok)')+tx(sx+4,cy+16,'Mid '+V(r.mid),'start','var(--ok)')+tx(150,208,'Height '+V(v.h),'middle','currentColor')}}
+};
+let tab='L 90°',vals={},last='';
+function nums(){const o={};T[tab].in.forEach(([k])=>o[k]=parseFloat(vals[tab+k]));return o}
+function build(){
+ tabs.innerHTML='';Object.keys(T).forEach(n=>{const b=document.createElement('button');b.textContent=n;b.className=n===tab?'on':'';b.onclick=()=>{tab=n;last='';build()};tabs.appendChild(b)});
+ const t=T[tab];if(t.def&&vals[tab+'a']===undefined)vals[tab+'a']=t.def;
+ inputs.innerHTML=t.in.map(([k,l])=>`<label>${l}</label><input id="i_${k}" type="number" inputmode="decimal" value="${vals[tab+k]??''}">`).join('');
+ if(t.preset){const c=document.createElement('div');c.className='chips';t.preset.forEach(p=>{const b=document.createElement('button');b.textContent=p+'°';b.onclick=()=>{vals[tab+'a']=p;document.getElementById('i_a').value=p;run()};c.appendChild(b)});inputs.appendChild(c)}
+ t.in.forEach(([k])=>document.getElementById('i_'+k).oninput=e=>{vals[tab+k]=e.target.value;last=k;run()});
+ note.textContent=t.note||'Ella measurement um same unit la podunga.';
+ run();
+}
+function run(){
+ const t=T[tab],v=nums(),need=last&&t.link&&t.link.includes(last)?last:t.in[0][0];
+ const keys=t.link?[need,...(t.extra||[])]:t.req;
+ if(!keys.every(k=>!isNaN(v[k])&&v[k]>0)){results.innerHTML='<div class="row"><span>Value podunga</span><b>—</b></div>';draw.style.display='none';return}
+ const r=t.calc(v,need);
+ if(t.link)t.link.forEach(k=>{if(k!==need&&k in r){vals[tab+k]=+r[k].toFixed(3);document.getElementById('i_'+k).value=vals[tab+k]}});
+ results.innerHTML=t.out.map(([k,l,s])=>`<div class="row"><span>${l}</span><b>${f(r[k])}${s||''}</b></div>`).join('');
+ draw.innerHTML=wrap(t.draw(v,r));draw.style.display='block';
+}
+unit.oninput=run;
+build();
+</script>
+</body>
+</html>
