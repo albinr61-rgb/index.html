@@ -3,92 +3,130 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Master Measurement Tool</title>
-  
-  <!-- Scale Icon (SVG Data URI) -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><path d='M20 70 L80 70 L80 40 L20 40 Z' fill='%23ffffff'/><line x1='30' y1='40' x2='30' y2='52' stroke='%232563eb' stroke-width='3'/><line x1='40' y1='40' x2='40' y2='60' stroke='%232563eb' stroke-width='4'/><line x1='50' y1='40' x2='50' y2='52' stroke='%232563eb' stroke-width='3'/><line x1='60' y1='40' x2='60' y2='60' stroke='%232563eb' stroke-width='4'/><line x1='70' y1='40' x2='70' y2='52' stroke='%232563eb' stroke-width='3'/></svg>">
+  <title>Scale Measurement Master</title>
+
+  <!-- High-Res Scale Ruler App Icon (SVG Data URI) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230284c7'/><path d='M15 70 L85 70 L85 35 L15 35 Z' fill='%23ffffff'/><line x1='25' y1='35' x2='25' y2='48' stroke='%230284c7' stroke-width='4'/><line x1='35' y1='35' x2='35' y2='58' stroke='%23ef4444' stroke-width='4'/><line x1='45' y1='35' x2='45' y2='48' stroke='%230284c7' stroke-width='4'/><line x1='55' y1='35' x2='55' y2='58' stroke='%23ef4444' stroke-width='4'/><line x1='65' y1='35' x2='65' y2='48' stroke='%230284c7' stroke-width='4'/><line x1='75' y1='35' x2='75' y2='58' stroke='%23ef4444' stroke-width='4'/></svg>">
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #0f172a; color: #f8fafc; padding: 12px; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 480px; background: #1e293b; border-radius: 18px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; touch-action: manipulation; }
+    body { background-color: #0b1329; color: #f8fafc; padding: 10px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 480px; background: #1e293b; border-radius: 20px; padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
     /* Header */
-    .header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
-    .header svg { width: 32px; height: 32px; }
-    .header h1 { font-size: 19px; color: #38bdf8; font-weight: 700; }
+    .header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
+    .scale-icon { width: 34px; height: 34px; background: #0284c7; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .header h1 { font-size: 18px; color: #38bdf8; font-weight: 800; letter-spacing: 0.5px; }
 
     /* Main Navigation */
-    .main-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 15px; }
-    .nav-btn { background: #334155; color: #94a3b8; border: none; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; }
+    .main-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+    .nav-btn { background: #334155; color: #cbd5e1; border: none; padding: 10px 4px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; }
     .nav-btn.active { background: #0284c7; color: #fff; }
 
     /* Sub Tabs */
-    .shape-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 15px; }
-    .s-btn { background: #1e293b; border: 1px solid #475569; color: #cbd5e1; padding: 8px 4px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
-    .s-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: bold; }
+    .shape-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 12px; }
+    .s-btn { background: #1e293b; border: 1px solid #475569; color: #cbd5e1; padding: 7px 2px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; }
+    .s-btn.active { background: #38bdf8; color: #0b1329; font-weight: bold; border-color: #38bdf8; }
 
     .tool-page, .shape-calc { display: none; }
     .tool-page.active, .shape-calc.active { display: block; }
 
-    /* Form Inputs */
-    .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 4px; }
+    /* Form Fields */
+    .form-group { margin-bottom: 10px; }
+    label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
     .input-row { display: flex; gap: 6px; }
-    input, select { padding: 10px; border-radius: 8px; border: 1.5px solid #475569; background: #0f172a; color: white; font-size: 15px; outline: none; }
+    input, select { padding: 10px; border-radius: 8px; border: 1.5px solid #475569; background: #0b1329; color: white; font-size: 15px; outline: none; }
     input { flex: 1; }
     select { width: 85px; }
     input:focus, select:focus { border-color: #38bdf8; }
 
-    button.action-btn { width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; margin-top: 5px; cursor: pointer; }
-    button.action-btn:active { background: #0369a1; }
+    button.btn-primary { width: 100%; padding: 11px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+    button.btn-primary:active { background: #0369a1; }
 
     /* Results */
-    .res-card { margin-top: 15px; background: #0f172a; border-radius: 10px; padding: 12px; border: 1px solid #334155; }
-    .res-title { font-size: 13px; color: #38bdf8; margin-bottom: 8px; font-weight: bold; border-bottom: 1px solid #334155; padding-bottom: 4px; }
-    .res-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: #e2e8f0; }
+    .res-card { margin-top: 12px; background: #0b1329; border-radius: 10px; padding: 12px; border: 1px solid #334155; }
+    .res-title { font-size: 12px; color: #38bdf8; margin-bottom: 6px; font-weight: bold; border-bottom: 1px solid #334155; padding-bottom: 3px; }
+    .res-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; color: #e2e8f0; }
     .res-val { font-weight: bold; color: #4ade80; }
 
-    /* Spirit Level */
-    .level-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 0; }
-    .bullseye { width: 220px; height: 220px; border-radius: 50%; background: #0f172a; border: 4px solid #38bdf8; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); }
-    .crosshair-h { position: absolute; width: 100%; height: 1px; background: rgba(56, 189, 248, 0.4); }
-    .crosshair-v { position: absolute; height: 100%; width: 1px; background: rgba(56, 189, 248, 0.4); }
-    .target-ring { width: 60px; height: 60px; border-radius: 50%; border: 2px dashed #4ade80; position: absolute; }
-    .bubble { width: 34px; height: 34px; border-radius: 50%; background: #ef4444; position: absolute; transition: transform 0.05s ease-out; box-shadow: 0 0 10px rgba(239,68,68,0.8); }
-    .bubble.level { background: #22c55e !important; box-shadow: 0 0 15px rgba(34,197,94,0.9) !important; }
-    .level-readings { margin-top: 15px; font-size: 16px; font-weight: bold; }
-
-    /* Camera Scale */
-    .cam-box { position: relative; width: 100%; height: 380px; background: #000; border-radius: 12px; overflow: hidden; }
+    /* Camera Viewport */
+    .cam-wrapper { position: relative; width: 100%; height: 380px; background: #000; border-radius: 14px; overflow: hidden; border: 2px solid #334155; }
     video { width: 100%; height: 100%; object-fit: cover; }
-    .cam-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-    .scale-ticks { position: absolute; left: 0; top: 0; width: 45px; height: 100%; border-right: 2px solid #ef4444; background: rgba(0,0,0,0.25); display: flex; flex-direction: column; justify-content: space-between; padding: 5px 0; color: #fff; font-size: 10px; font-weight: bold; }
-    .cam-ctrls { display: flex; gap: 8px; margin-top: 10px; }
+    canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; cursor: crosshair; }
+    .cam-instruction { position: absolute; top: 8px; left: 8px; right: 8px; background: rgba(15, 23, 42, 0.85); padding: 8px 12px; border-radius: 8px; font-size: 12px; color: #38bdf8; text-align: center; z-index: 12; border: 1px solid #0284c7; pointer-events: none; }
+
+    /* Calibration controls */
+    .calib-box { background: #0b1329; padding: 10px; border-radius: 8px; margin-top: 8px; border: 1px solid #334155; font-size: 12px; }
+    .calib-box .input-row { margin-top: 6px; }
+
+    /* Spirit Level */
+    .bullseye { width: 220px; height: 220px; border-radius: 50%; background: #0b1329; border: 4px solid #38bdf8; position: relative; display: flex; align-items: center; justify-content: center; margin: 20px auto; }
+    .cross-h { position: absolute; width: 100%; height: 1px; background: rgba(56, 189, 248, 0.4); }
+    .cross-v { position: absolute; height: 100%; width: 1px; background: rgba(56, 189, 248, 0.4); }
+    .ring { width: 60px; height: 60px; border-radius: 50%; border: 2px dashed #4ade80; position: absolute; }
+    .bubble { width: 34px; height: 34px; border-radius: 50%; background: #ef4444; position: absolute; transition: transform 0.05s ease-out; }
+    .bubble.level { background: #22c55e !important; box-shadow: 0 0 15px rgba(34,197,94,0.9); }
   </style>
 </head>
 <body>
 
 <div class="container">
   
-  <!-- Header with Ruler SVG -->
+  <!-- Header with Ruler Icon -->
   <div class="header">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
-      <path d="M21.3 8.7 8.7 21.3c-1 1-2.5 1-3.4 0l-2.6-2.6c-1-1-1-2.5 0-3.4L15.3 2.7c1-1 2.5-1 3.4 0l2.6 2.6c1 1 1 2.5 0 3.4Z"/>
-      <path d="m7.5 10.5 2 2"/><path d="m10.5 7.5 2 2"/><path d="m13.5 4.5 2 2"/><path d="m4.5 13.5 2 2"/>
-    </svg>
-    <h1>MEASURE MASTER</h1>
+    <div class="scale-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M2 12h20M6 12v-4M10 12v-6M14 12v-4M18 12v-6"/></svg>
+    </div>
+    <h1>SCALE MEASURE MASTER</h1>
   </div>
 
-  <!-- Main 3 Navigation Tabs -->
+  <!-- Main Tabs -->
   <div class="main-nav">
-    <button class="nav-btn active" onclick="switchTool('calcTool')">📐 கணக்கீடு</button>
-    <button class="nav-btn" onclick="switchTool('levelTool')">🟢 மட்டம் (Level)</button>
-    <button class="nav-btn" onclick="switchTool('camTool')">📷 கேமரா ஸ்கேல்</button>
+    <button class="nav-btn" onclick="switchTool('calcTool')">📐 கணக்கீடு</button>
+    <button class="nav-btn active" onclick="switchTool('camTool')">📷 கேமரா அளவுகோல்</button>
+    <button class="nav-btn" onclick="switchTool('levelTool')">🟢 குமிழ் மட்டம்</button>
   </div>
 
-  <!-- TOOL 1: CALCULATOR -->
-  <div id="calcTool" class="tool-page active">
+  <!-- TOOL 1: CAMERA 2-POINT SCALE MEASURE -->
+  <div id="camTool" class="tool-page active">
+    <div class="cam-wrapper" id="camWrapper">
+      <div class="cam-instruction" id="camHelp">
+        👉 கேமராவை ஆன் செய்து பொருளின் 1-வது முனையை தொடவும்
+      </div>
+      <video id="videoFeed" playsinline autoplay muted></video>
+      <canvas id="measureCanvas"></canvas>
+    </div>
+
+    <!-- Camera Controls -->
+    <div style="display:flex; gap:6px; margin-top:8px;">
+      <button class="btn-primary" style="background:#22c55e;" onclick="startCamera()">📷 கேமராவை திறக்க</button>
+      <button class="btn-primary" style="background:#eab308; color:#000;" onclick="resetPoints()">🔄 Reset Point</button>
+      <button class="btn-primary" style="background:#ef4444;" onclick="stopCamera()">Stop</button>
+    </div>
+
+    <!-- Live Measured Output Card -->
+    <div id="camResultCard" class="res-card" style="display:none;">
+      <div class="res-title">🎯 அளவிடப்பட்ட அளவு (MEASURED DISTANCE):</div>
+      <div class="res-item"><span>சென்டிமீட்டர் (cm):</span><span class="res-val" id="resCm">0 cm</span></div>
+      <div class="res-item"><span>மில்லிமீட்டர் (mm):</span><span class="res-val" id="resMm">0 mm</span></div>
+      <div class="res-item"><span>அங்குலம் (Inches):</span><span class="res-val" id="resInch">0 in</span></div>
+      <div class="res-item"><span>அடி (Feet):</span><span class="res-val" id="resFt">0 ft</span></div>
+    </div>
+
+    <!-- Calibration Settings -->
+    <div class="calib-box">
+      <b>⚙️ அளவை துல்லியமாக்க (Calibration):</b>
+      <p style="color:#94a3b8; font-size:11px; margin-top:2px;">பொருளின் மேல் ATM கார்டு (8.5 cm) வைத்து 2 முனையை தொட்டு Calibrate அழுத்தவும்.</p>
+      <div class="input-row">
+        <input type="number" id="calibRealVal" placeholder="உதாரணம்: 8.5" value="8.5">
+        <select id="calibUnit"><option value="cm">cm</option><option value="inch">inch</option><option value="mm">mm</option></select>
+        <button onclick="applyCalibration()" style="background:#38bdf8; border:none; padding:0 12px; border-radius:6px; font-weight:bold; color:#0b1329;">Calibrate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 2: CALCULATOR (ALL UNITS) -->
+  <div id="calcTool" class="tool-page">
     <div class="shape-tabs">
       <button class="s-btn active" onclick="switchShape('s90')">90° செங்கோணம்</button>
       <button class="s-btn" onclick="switchShape('s45')">45° சாய்வு</button>
@@ -102,17 +140,17 @@
         <label>அடி மட்டம் (Base A):</label>
         <div class="input-row">
           <input type="number" id="base90" placeholder="அளவு">
-          <select id="uBase90"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">meter</option></select>
+          <select id="uBase90"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option></select>
         </div>
       </div>
       <div class="form-group">
-        <label>செங்குத்து உயரம் (Height B):</label>
+        <label>உயரம் (Height B):</label>
         <div class="input-row">
           <input type="number" id="h90" placeholder="அளவு">
-          <select id="uH90"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">meter</option></select>
+          <select id="uH90"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option></select>
         </div>
       </div>
-      <button class="action-btn" onclick="run90()">கணக்கிடு (90°)</button>
+      <button class="btn-primary" onclick="run90()">கணக்கிடு (90°)</button>
     </div>
 
     <!-- 45 Deg -->
@@ -121,88 +159,69 @@
         <label>பக்க அளவு (Side / Offset):</label>
         <div class="input-row">
           <input type="number" id="side45" placeholder="அளவு">
-          <select id="u45"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">meter</option></select>
+          <select id="u45"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option></select>
         </div>
       </div>
-      <button class="action-btn" onclick="run45()">கணக்கிடு (45°)</button>
+      <button class="btn-primary" onclick="run45()">கணக்கிடு (45°)</button>
     </div>
 
     <!-- Round -->
     <div id="sRound" class="shape-calc">
       <div class="form-group">
-        <label>விட்டம் / Diameter (முழு அகலம்):</label>
+        <label>விட்டம் / Diameter:</label>
         <div class="input-row">
           <input type="number" id="diaR" placeholder="Diameter">
-          <select id="uDia"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">meter</option></select>
+          <select id="uDia"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option></select>
         </div>
       </div>
-      <button class="action-btn" onclick="runRound()">கணக்கிடு (வட்டம்)</button>
+      <button class="btn-primary" onclick="runRound()">கணக்கிடு (வட்டம்)</button>
     </div>
 
     <!-- Square -->
     <div id="sSquare" class="shape-calc">
       <div class="form-group">
-        <label>சதுரத்தின் ஒரு பக்கம் (Side):</label>
+        <label>சதுரத்தின் பக்கம் (Side):</label>
         <div class="input-row">
           <input type="number" id="sideSq" placeholder="அளவு">
-          <select id="uSq"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">meter</option></select>
+          <select id="uSq"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option></select>
         </div>
       </div>
-      <button class="action-btn" onclick="runSquare()">கணக்கிடு (சதுரம்)</button>
+      <button class="btn-primary" onclick="runSquare()">கணக்கிடு (சதுரம்)</button>
     </div>
 
-    <!-- Multi-Unit Result Card -->
+    <!-- Calculator Results -->
     <div id="resultCard" class="res-card" style="display:none;">
-      <div class="res-title">📐 துல்லியமான முடிவுகள் (ALL UNITS):</div>
+      <div class="res-title">📐 துல்லியமான முடிவுகள்:</div>
       <div id="resBody"></div>
     </div>
   </div>
 
-  <!-- TOOL 2: SPIRIT LEVEL -->
+  <!-- TOOL 3: SPIRIT LEVEL -->
   <div id="levelTool" class="tool-page">
-    <div class="level-container">
+    <div style="text-align:center;">
       <div class="bullseye">
-        <div class="crosshair-h"></div>
-        <div class="crosshair-v"></div>
-        <div class="target-ring"></div>
+        <div class="cross-h"></div>
+        <div class="cross-v"></div>
+        <div class="ring"></div>
         <div class="bubble" id="levelBubble"></div>
       </div>
-      <div class="level-readings" id="levelRead">X: 0.0° | Y: 0.0°</div>
-      <p style="color:#64748b; font-size:12px; margin-top:8px;">(பச்சை நிறம் வந்தால் சரியான மட்டம்)</p>
-      <button class="action-btn" style="margin-top:15px; width:auto; padding:8px 20px;" onclick="requestSensors()">Start Level Sensor</button>
-    </div>
-  </div>
-
-  <!-- TOOL 3: CAMERA SCALE -->
-  <div id="camTool" class="tool-page">
-    <div class="cam-box">
-      <video id="videoFeed" playsinline autoplay></video>
-      <div class="cam-overlay">
-        <!-- Scale Bar on Screen -->
-        <div class="scale-ticks">
-          <span>10cm</span><span>9cm</span><span>8cm</span><span>7cm</span><span>6cm</span><span>5cm</span><span>4cm</span><span>3cm</span><span>2cm</span><span>1cm</span><span>0</span>
-        </div>
-        <!-- Alignment crosshair in center -->
-        <div style="position:absolute; top:50%; left:0; width:100%; height:1px; background:rgba(34,197,94,0.6);"></div>
-        <div style="position:absolute; left:50%; top:0; width:1px; height:100%; background:rgba(34,197,94,0.6);"></div>
-      </div>
-    </div>
-    <div class="cam-ctrls">
-      <button class="action-btn" onclick="startCamera()">📷 கேமரா Start</button>
-      <button class="action-btn" style="background:#dc2626;" onclick="stopCamera()">Stop</button>
+      <div style="font-size:16px; font-weight:bold;" id="levelRead">X: 0.0° | Y: 0.0°</div>
+      <p style="color:#64748b; font-size:12px; margin-top:4px;">மட்டம் சரியானால் பச்சை நிறமாக மாறும்</p>
+      <button class="btn-primary" style="margin-top:14px; width:auto; padding:8px 24px;" onclick="requestSensors()">Start Level Sensor</button>
     </div>
   </div>
 
 </div>
 
 <script>
-  // Navigation Tabs
+  // Navigation
   function switchTool(id) {
     document.querySelectorAll('.tool-page').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     event.target.classList.add('active');
-    if(id !== 'camTool') stopCamera();
+    if (id !== 'camTool') stopCamera();
+    else initCanvasSize();
   }
 
   function switchShape(id) {
@@ -213,7 +232,151 @@
     document.getElementById('resultCard').style.display = 'none';
   }
 
-  // UNIT CONVERSION ENGINE (Base = Millimeters)
+  /* ========================================================
+     CAMERA 2-POINT TAP-TO-MEASURE ENGINE
+     ======================================================== */
+  let streamRef = null;
+  let canvas = document.getElementById('measureCanvas');
+  let ctx = canvas.getContext('2d');
+  let pointA = null;
+  let pointB = null;
+  let pxPerCm = 25.0; // Default calibration: 25 pixels = 1 cm
+
+  function initCanvasSize() {
+    let wrap = document.getElementById('camWrapper');
+    canvas.width = wrap.clientWidth;
+    canvas.height = wrap.clientHeight;
+    drawCanvas();
+  }
+  window.addEventListener('resize', initCanvasSize);
+
+  async function startCamera() {
+    try {
+      stopCamera();
+      initCanvasSize();
+      const constraints = { video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 } } };
+      streamRef = await navigator.mediaDevices.getUserMedia(constraints);
+      document.getElementById('videoFeed').srcObject = streamRef;
+      document.getElementById('camHelp').innerText = "📍 முதல் முனையை (Point A) திரையில் தொடவும்";
+    } catch (err) {
+      alert("கேமரா அனுமதி தேவை: Browser செட்டிங்ஸில் Camera 'Allow' செய்யவும்.");
+    }
+  }
+
+  function stopCamera() {
+    if (streamRef) {
+      streamRef.getTracks().forEach(t => t.stop());
+      streamRef = null;
+    }
+  }
+
+  // Handle Touch/Click on Screen
+  canvas.addEventListener('pointerdown', function(e) {
+    let rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    if (!pointA) {
+      pointA = { x, y };
+      document.getElementById('camHelp').innerText = "📍 அடுத்த முனையை (Point B) திரையில் தொடவும்";
+    } else if (!pointB) {
+      pointB = { x, y };
+      calculateCameraDistance();
+      document.getElementById('camHelp').innerText = "✅ அளவு கணக்கிடப்பட்டது! (Reset செய்ய மஞ்சள் பட்டன்)";
+    }
+    drawCanvas();
+  });
+
+  function resetPoints() {
+    pointA = null;
+    pointB = null;
+    document.getElementById('camResultCard').style.display = 'none';
+    document.getElementById('camHelp').innerText = "📍 முதல் முனையை (Point A) திரையில் தொடவும்";
+    drawCanvas();
+  }
+
+  function drawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw Point A (Red)
+    if (pointA) {
+      ctx.beginPath();
+      ctx.arc(pointA.x, pointA.y, 8, 0, 2 * Math.PI);
+      ctx.fillStyle = '#ef4444';
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText("A (தொடக்க புள்ளி)", pointA.x + 12, pointA.y - 5);
+    }
+
+    // Draw Point B (Green) & Line
+    if (pointB) {
+      ctx.beginPath();
+      ctx.arc(pointB.x, pointB.y, 8, 0, 2 * Math.PI);
+      ctx.fillStyle = '#22c55e';
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText("B (முடிவு புள்ளி)", pointB.x + 12, pointB.y - 5);
+
+      // Connecting Tape Line
+      ctx.beginPath();
+      ctx.setLineDash([6, 4]);
+      ctx.moveTo(pointA.x, pointA.y);
+      ctx.lineTo(pointB.x, pointB.y);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  function calculateCameraDistance() {
+    if (!pointA || !pointB) return;
+    let dx = pointB.x - pointA.x;
+    let dy = pointB.y - pointA.y;
+    let pixelDist = Math.sqrt(dx * dx + dy * dy);
+
+    let cm = pixelDist / pxPerCm;
+    let mm = cm * 10;
+    let inch = cm / 2.54;
+    let feet = inch / 12;
+
+    document.getElementById('resCm').innerText = cm.toFixed(1) + " cm";
+    document.getElementById('resMm').innerText = mm.toFixed(0) + " mm";
+    document.getElementById('resInch').innerText = inch.toFixed(2) + " in";
+    document.getElementById('resFt').innerText = feet.toFixed(3) + " ft";
+    document.getElementById('camResultCard').style.display = 'block';
+  }
+
+  function applyCalibration() {
+    if (!pointA || !pointB) return alert("முதலில் திரையில் ஏதேனும் 2 புள்ளிகளைத் தொட்டு அளவிடவும்!");
+    let realVal = parseFloat(document.getElementById('calibRealVal').value);
+    let unit = document.getElementById('calibUnit').value;
+    if (!realVal) return alert("துல்லியமான அளவை உள்ளிடவும்");
+
+    let realCm = realVal;
+    if (unit === 'mm') realCm = realVal / 10;
+    if (unit === 'inch') realCm = realVal * 2.54;
+
+    let dx = pointB.x - pointA.x;
+    let dy = pointB.y - pointA.y;
+    let pixelDist = Math.sqrt(dx * dx + dy * dy);
+
+    pxPerCm = pixelDist / realCm;
+    calculateCameraDistance();
+    alert("✅ அளவுகோல் Calibrate செய்யப்பட்டது! இப்போது துல்லியமாக அளக்கலாம்.");
+  }
+
+  /* ========================================================
+     CALCULATOR MULTI-UNIT ENGINE
+     ======================================================== */
   const toMM = { 'mm': 1, 'cm': 10, 'm': 1000, 'inch': 25.4, 'feet': 304.8 };
 
   function renderOutput(lengthMM, areaMM2 = null) {
@@ -224,88 +387,63 @@
     if (lengthMM !== null) {
       let ft = lengthMM / toMM.feet;
       let inc = lengthMM / toMM.inch;
-      let mm = lengthMM;
-      let cm = lengthMM / toMM.cm;
-      let m = lengthMM / toMM.m;
-
       body.innerHTML += `
         <div class="res-item"><span>நீளம் (Feet):</span><span class="res-val">${ft.toFixed(3)} ft (${Math.floor(ft)}' ${(inc%12).toFixed(1)}")</span></div>
         <div class="res-item"><span>நீளம் (Inches):</span><span class="res-val">${inc.toFixed(2)} in</span></div>
-        <div class="res-item"><span>நீளம் (mm):</span><span class="res-val">${mm.toFixed(1)} mm</span></div>
-        <div class="res-item"><span>நீளம் (cm):</span><span class="res-val">${cm.toFixed(1)} cm</span></div>
-        <div class="res-item"><span>நீளம் (Meter):</span><span class="res-val">${m.toFixed(3)} m</span></div>
+        <div class="res-item"><span>நீளம் (mm):</span><span class="res-val">${lengthMM.toFixed(1)} mm</span></div>
+        <div class="res-item"><span>நீளம் (cm):</span><span class="res-val">${(lengthMM/10).toFixed(1)} cm</span></div>
+        <div class="res-item"><span>நீளம் (Meter):</span><span class="res-val">${(lengthMM/1000).toFixed(3)} m</span></div>
       `;
     }
-
     if (areaMM2 !== null) {
       let sqFt = areaMM2 / (304.8 * 304.8);
       let sqM = areaMM2 / (1000 * 1000);
       let sqInc = areaMM2 / (25.4 * 25.4);
       let sqCm = areaMM2 / 100;
-
       body.innerHTML += `
-        <div style="margin:8px 0; border-top:1px dashed #334155;"></div>
+        <div style="margin:6px 0; border-top:1px dashed #334155;"></div>
         <div class="res-item"><span>பரப்பளவு (Sq Feet):</span><span class="res-val">${sqFt.toFixed(3)} sq.ft</span></div>
         <div class="res-item"><span>பரப்பளவு (Sq Meter):</span><span class="res-val">${sqM.toFixed(3)} sq.m</span></div>
-        <div class="res-item"><span>பரப்பளவு (Sq Inch):</span><span class="res-val">${sqInc.toFixed(2)} sq.in</span></div>
+        <div class="res-item"><span>பரப்பளவு (Sq Inch):</span><span class="res-val">${sqInc.toFixed(1)} sq.in</span></div>
         <div class="res-item"><span>பரப்பளவு (Sq cm):</span><span class="res-val">${sqCm.toFixed(1)} sq.cm</span></div>
       `;
     }
     card.style.display = 'block';
   }
 
-  // 1. 90 Deg Calculation
   function run90() {
     let b = parseFloat(document.getElementById('base90').value);
     let h = parseFloat(document.getElementById('h90').value);
-    let ub = document.getElementById('uBase90').value;
-    let uh = document.getElementById('uH90').value;
-    if(!b || !h) return alert('அளவுகளை உள்ளிடவும்');
-
-    let bMM = b * toMM[ub];
-    let hMM = h * toMM[uh];
-    let diagMM = Math.sqrt((bMM * bMM) + (hMM * hMM));
-    let areaMM2 = 0.5 * bMM * hMM;
-    renderOutput(diagMM, areaMM2);
+    if (!b || !h) return alert('அளவை உள்ளிடவும்');
+    let bMM = b * toMM[document.getElementById('uBase90').value];
+    let hMM = h * toMM[document.getElementById('uH90').value];
+    renderOutput(Math.sqrt((bMM*bMM) + (hMM*hMM)), 0.5 * bMM * hMM);
   }
 
-  // 2. 45 Deg Calculation
   function run45() {
     let s = parseFloat(document.getElementById('side45').value);
-    let u = document.getElementById('u45').value;
-    if(!s) return alert('அளவை உள்ளிடவும்');
-
-    let sMM = s * toMM[u];
-    let travelMM = sMM * 1.41421356;
-    renderOutput(travelMM, null);
+    if (!s) return alert('அளவை உள்ளிடவும்');
+    let sMM = s * toMM[document.getElementById('u45').value];
+    renderOutput(sMM * 1.41421356, null);
   }
 
-  // 3. Round
   function runRound() {
     let d = parseFloat(document.getElementById('diaR').value);
-    let u = document.getElementById('uDia').value;
-    if(!d) return alert('விட்டம் உள்ளிடவும்');
-
-    let dMM = d * toMM[u];
-    let rMM = dMM / 2;
-    let circMM = Math.PI * dMM;
-    let areaMM2 = Math.PI * rMM * rMM;
-    renderOutput(circMM, areaMM2);
+    if (!d) return alert('விட்டம் உள்ளிடவும்');
+    let dMM = d * toMM[document.getElementById('uDia').value];
+    renderOutput(Math.PI * dMM, Math.PI * (dMM/2) * (dMM/2));
   }
 
-  // 4. Square
   function runSquare() {
     let s = parseFloat(document.getElementById('sideSq').value);
-    let u = document.getElementById('uSq').value;
-    if(!s) return alert('அளவை உள்ளிடவும்');
-
-    let sMM = s * toMM[u];
-    let diagMM = sMM * 1.41421356;
-    let areaMM2 = sMM * sMM;
-    renderOutput(diagMM, areaMM2);
+    if (!s) return alert('பக்கத்தை உள்ளிடவும்');
+    let sMM = s * toMM[document.getElementById('uSq').value];
+    renderOutput(sMM * 1.41421356, sMM * sMM);
   }
 
-  // TOOL 2: SPIRIT LEVEL ENGINE (Orientation API)
+  /* ========================================================
+     SPIRIT LEVEL
+     ======================================================== */
   function requestSensors() {
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
       DeviceOrientationEvent.requestPermission().then(state => {
@@ -317,43 +455,17 @@
   }
 
   function handleOrientation(e) {
-    let x = e.gamma || 0; // Left-Right [-90, 90]
-    let y = e.beta || 0;  // Front-Back [-180, 180]
-
-    let maxMove = 90;
-    let posX = Math.max(-maxMove, Math.min(maxMove, x * 2));
-    let posY = Math.max(-maxMove, Math.min(maxMove, y * 2));
-
+    let x = e.gamma || 0;
+    let y = e.beta || 0;
+    let posX = Math.max(-90, Math.min(90, x * 2));
+    let posY = Math.max(-90, Math.min(90, y * 2));
     let bubble = document.getElementById('levelBubble');
     bubble.style.transform = `translate(${posX}px, ${posY}px)`;
 
-    let isLevel = Math.abs(x) < 1.0 && Math.abs(y) < 1.0;
-    if (isLevel) {
-      bubble.classList.add('level');
-    } else {
-      bubble.classList.remove('level');
-    }
+    if (Math.abs(x) < 1.0 && Math.abs(y) < 1.0) bubble.classList.add('level');
+    else bubble.classList.remove('level');
 
     document.getElementById('levelRead').innerText = `X: ${x.toFixed(1)}° | Y: ${y.toFixed(1)}°`;
-  }
-
-  // TOOL 3: CAMERA STREAM ENGINE
-  let streamRef = null;
-  async function startCamera() {
-    try {
-      const constraints = { video: { facingMode: { ideal: "environment" } } };
-      streamRef = await navigator.mediaDevices.getUserMedia(constraints);
-      document.getElementById('videoFeed').srcObject = streamRef;
-    } catch (err) {
-      alert("கேமரா அனுமதி கிடைக்கவில்லை: " + err.message);
-    }
-  }
-
-  function stopCamera() {
-    if (streamRef) {
-      streamRef.getTracks().forEach(t => t.stop());
-      streamRef = null;
-    }
   }
 </script>
 
