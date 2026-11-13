@@ -1,111 +1,361 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ta">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fab Calc</title>
-<style>
-:root{--bg:#f6f7f9;--card:#fff;--tx:#14181f;--mu:#667085;--ac:#e8590c;--bd:#e1e4ea;--ok:#0b7a43;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151a;--card:#1c2028;--tx:#eef1f6;--mu:#9aa3b2;--ac:#ff8a4c;--bd:#2c323d;--ok:#4cd694}}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:480px;margin:0 auto;padding:16px}
-.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-h1{font-size:20px;margin:0}
-#unit{width:80px;font-size:16px;padding:6px 8px;text-align:center}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
-.tabs button{padding:12px 0;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font-size:15px;font-weight:600}
-.tabs button.on{background:var(--ac);border-color:var(--ac);color:#fff}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
-label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
-input{width:100%;font-size:20px;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)}
-.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 0;border-bottom:1px solid var(--bd)}
-.row:last-child{border:0}
-.row span{color:var(--mu);font-size:14px}
-.row b{font-size:20px;color:var(--ok)}
-.chips{display:flex;gap:8px;margin-top:10px}
-.chips button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:16px}
-.note{font-size:12px;color:var(--mu);text-align:center}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Master Measurement Tool</title>
+  
+  <!-- Scale Icon (SVG Data URI) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><path d='M20 70 L80 70 L80 40 L20 40 Z' fill='%23ffffff'/><line x1='30' y1='40' x2='30' y2='52' stroke='%232563eb' stroke-width='3'/><line x1='40' y1='40' x2='40' y2='60' stroke='%232563eb' stroke-width='4'/><line x1='50' y1='40' x2='50' y2='52' stroke='%232563eb' stroke-width='3'/><line x1='60' y1='40' x2='60' y2='60' stroke='%232563eb' stroke-width='4'/><line x1='70' y1='40' x2='70' y2='52' stroke='%232563eb' stroke-width='3'/></svg>">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; padding: 12px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 480px; background: #1e293b; border-radius: 18px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+
+    /* Header */
+    .header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
+    .header svg { width: 32px; height: 32px; }
+    .header h1 { font-size: 19px; color: #38bdf8; font-weight: 700; }
+
+    /* Main Navigation */
+    .main-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 15px; }
+    .nav-btn { background: #334155; color: #94a3b8; border: none; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; }
+    .nav-btn.active { background: #0284c7; color: #fff; }
+
+    /* Sub Tabs */
+    .shape-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 15px; }
+    .s-btn { background: #1e293b; border: 1px solid #475569; color: #cbd5e1; padding: 8px 4px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .s-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: bold; }
+
+    .tool-page, .shape-calc { display: none; }
+    .tool-page.active, .shape-calc.active { display: block; }
+
+    /* Form Inputs */
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 4px; }
+    .input-row { display: flex; gap: 6px; }
+    input, select { padding: 10px; border-radius: 8px; border: 1.5px solid #475569; background: #0f172a; color: white; font-size: 15px; outline: none; }
+    input { flex: 1; }
+    select { width: 85px; }
+    input:focus, select:focus { border-color: #38bdf8; }
+
+    button.action-btn { width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; margin-top: 5px; cursor: pointer; }
+    button.action-btn:active { background: #0369a1; }
+
+    /* Results */
+    .res-card { margin-top: 15px; background: #0f172a; border-radius: 10px; padding: 12px; border: 1px solid #334155; }
+    .res-title { font-size: 13px; color: #38bdf8; margin-bottom: 8px; font-weight: bold; border-bottom: 1px solid #334155; padding-bottom: 4px; }
+    .res-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: #e2e8f0; }
+    .res-val { font-weight: bold; color: #4ade80; }
+
+    /* Spirit Level */
+    .level-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 0; }
+    .bullseye { width: 220px; height: 220px; border-radius: 50%; background: #0f172a; border: 4px solid #38bdf8; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); }
+    .crosshair-h { position: absolute; width: 100%; height: 1px; background: rgba(56, 189, 248, 0.4); }
+    .crosshair-v { position: absolute; height: 100%; width: 1px; background: rgba(56, 189, 248, 0.4); }
+    .target-ring { width: 60px; height: 60px; border-radius: 50%; border: 2px dashed #4ade80; position: absolute; }
+    .bubble { width: 34px; height: 34px; border-radius: 50%; background: #ef4444; position: absolute; transition: transform 0.05s ease-out; box-shadow: 0 0 10px rgba(239,68,68,0.8); }
+    .bubble.level { background: #22c55e !important; box-shadow: 0 0 15px rgba(34,197,94,0.9) !important; }
+    .level-readings { margin-top: 15px; font-size: 16px; font-weight: bold; }
+
+    /* Camera Scale */
+    .cam-box { position: relative; width: 100%; height: 380px; background: #000; border-radius: 12px; overflow: hidden; }
+    video { width: 100%; height: 100%; object-fit: cover; }
+    .cam-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    .scale-ticks { position: absolute; left: 0; top: 0; width: 45px; height: 100%; border-right: 2px solid #ef4444; background: rgba(0,0,0,0.25); display: flex; flex-direction: column; justify-content: space-between; padding: 5px 0; color: #fff; font-size: 10px; font-weight: bold; }
+    .cam-ctrls { display: flex; gap: 8px; margin-top: 10px; }
+  </style>
 </head>
 <body>
-<main>
-<div class="top"><h1>Fab Calc</h1><input id="unit" value="cm" aria-label="unit"></div>
-<div class="tabs" id="tabs"></div>
-<div class="card" id="inputs"></div>
-<div class="card" id="draw" style="display:none"></div>
-<div class="card" id="results"></div>
-<p class="note" id="note"></p>
-</main>
+
+<div class="container">
+  
+  <!-- Header with Ruler SVG -->
+  <div class="header">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+      <path d="M21.3 8.7 8.7 21.3c-1 1-2.5 1-3.4 0l-2.6-2.6c-1-1-1-2.5 0-3.4L15.3 2.7c1-1 2.5-1 3.4 0l2.6 2.6c1 1 1 2.5 0 3.4Z"/>
+      <path d="m7.5 10.5 2 2"/><path d="m10.5 7.5 2 2"/><path d="m13.5 4.5 2 2"/><path d="m4.5 13.5 2 2"/>
+    </svg>
+    <h1>MEASURE MASTER</h1>
+  </div>
+
+  <!-- Main 3 Navigation Tabs -->
+  <div class="main-nav">
+    <button class="nav-btn active" onclick="switchTool('calcTool')">📐 கணக்கீடு</button>
+    <button class="nav-btn" onclick="switchTool('levelTool')">🟢 மட்டம் (Level)</button>
+    <button class="nav-btn" onclick="switchTool('camTool')">📷 கேமரா ஸ்கேல்</button>
+  </div>
+
+  <!-- TOOL 1: CALCULATOR -->
+  <div id="calcTool" class="tool-page active">
+    <div class="shape-tabs">
+      <button class="s-btn active" onclick="switchShape('s90')">90° செங்கோணம்</button>
+      <button class="s-btn" onclick="switchShape('s45')">45° சாய்வு</button>
+      <button class="s-btn" onclick="switchShape('sRound')">Round வட்டம்</button>
+      <button class="s-btn" onclick="switchShape('sSquare')">Square சதுரம்</button>
+    </div>
+
+    <!-- 90 Deg -->
+    <div id="s90" class="shape-calc active">
+      <div class="form-group">
+        <label>அடி மட்டம் (Base A):</label>
+        <div class="input-row">
+          <input type="number" id="base90" placeholder="அளவு">
+          <select id="uBase90"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">meter</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>செங்குத்து உயரம் (Height B):</label>
+        <div class="input-row">
+          <input type="number" id="h90" placeholder="அளவு">
+          <select id="uH90"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">meter</option></select>
+        </div>
+      </div>
+      <button class="action-btn" onclick="run90()">கணக்கிடு (90°)</button>
+    </div>
+
+    <!-- 45 Deg -->
+    <div id="s45" class="shape-calc">
+      <div class="form-group">
+        <label>பக்க அளவு (Side / Offset):</label>
+        <div class="input-row">
+          <input type="number" id="side45" placeholder="அளவு">
+          <select id="u45"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">meter</option></select>
+        </div>
+      </div>
+      <button class="action-btn" onclick="run45()">கணக்கிடு (45°)</button>
+    </div>
+
+    <!-- Round -->
+    <div id="sRound" class="shape-calc">
+      <div class="form-group">
+        <label>விட்டம் / Diameter (முழு அகலம்):</label>
+        <div class="input-row">
+          <input type="number" id="diaR" placeholder="Diameter">
+          <select id="uDia"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">meter</option></select>
+        </div>
+      </div>
+      <button class="action-btn" onclick="runRound()">கணக்கிடு (வட்டம்)</button>
+    </div>
+
+    <!-- Square -->
+    <div id="sSquare" class="shape-calc">
+      <div class="form-group">
+        <label>சதுரத்தின் ஒரு பக்கம் (Side):</label>
+        <div class="input-row">
+          <input type="number" id="sideSq" placeholder="அளவு">
+          <select id="uSq"><option value="feet">Feet</option><option value="inch">Inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="m">meter</option></select>
+        </div>
+      </div>
+      <button class="action-btn" onclick="runSquare()">கணக்கிடு (சதுரம்)</button>
+    </div>
+
+    <!-- Multi-Unit Result Card -->
+    <div id="resultCard" class="res-card" style="display:none;">
+      <div class="res-title">📐 துல்லியமான முடிவுகள் (ALL UNITS):</div>
+      <div id="resBody"></div>
+    </div>
+  </div>
+
+  <!-- TOOL 2: SPIRIT LEVEL -->
+  <div id="levelTool" class="tool-page">
+    <div class="level-container">
+      <div class="bullseye">
+        <div class="crosshair-h"></div>
+        <div class="crosshair-v"></div>
+        <div class="target-ring"></div>
+        <div class="bubble" id="levelBubble"></div>
+      </div>
+      <div class="level-readings" id="levelRead">X: 0.0° | Y: 0.0°</div>
+      <p style="color:#64748b; font-size:12px; margin-top:8px;">(பச்சை நிறம் வந்தால் சரியான மட்டம்)</p>
+      <button class="action-btn" style="margin-top:15px; width:auto; padding:8px 20px;" onclick="requestSensors()">Start Level Sensor</button>
+    </div>
+  </div>
+
+  <!-- TOOL 3: CAMERA SCALE -->
+  <div id="camTool" class="tool-page">
+    <div class="cam-box">
+      <video id="videoFeed" playsinline autoplay></video>
+      <div class="cam-overlay">
+        <!-- Scale Bar on Screen -->
+        <div class="scale-ticks">
+          <span>10cm</span><span>9cm</span><span>8cm</span><span>7cm</span><span>6cm</span><span>5cm</span><span>4cm</span><span>3cm</span><span>2cm</span><span>1cm</span><span>0</span>
+        </div>
+        <!-- Alignment crosshair in center -->
+        <div style="position:absolute; top:50%; left:0; width:100%; height:1px; background:rgba(34,197,94,0.6);"></div>
+        <div style="position:absolute; left:50%; top:0; width:1px; height:100%; background:rgba(34,197,94,0.6);"></div>
+      </div>
+    </div>
+    <div class="cam-ctrls">
+      <button class="action-btn" onclick="startCamera()">📷 கேமரா Start</button>
+      <button class="action-btn" style="background:#dc2626;" onclick="stopCamera()">Stop</button>
+    </div>
+  </div>
+
+</div>
+
 <script>
-const S2=Math.SQRT2,PI=Math.PI,rad=x=>x*PI/180,deg=x=>x*180/PI;
-const f=n=>isFinite(n)?String(+n.toFixed(2)):'—';
-const U=()=>unit.value||'';
-const V=n=>f(n)+' '+U();
-const tx=(x,y,s,a='middle',c='var(--ac)')=>`<text x="${x}" y="${y}" text-anchor="${a}" fill="${c}" font-size="13" font-weight="700" stroke="var(--card)" stroke-width="3" paint-order="stroke">${s}</text>`;
-const ln=(a,b,c,d,w=2,dash='',col='currentColor')=>`<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="${col}" stroke-width="${w}"${dash?` stroke-dasharray="${dash}"`:''} stroke-linecap="round"/>`;
-const wrap=s=>`<svg viewBox="0 0 300 220" style="width:100%;color:var(--tx)">${s}</svg>`;
-const T={
-'L 90°':{in:[['a','Side A (vertical)'],['b','Side B (horizontal)']],req:['a','b'],
- calc:v=>({tot:v.a+v.b,c:Math.hypot(v.a,v.b),rect:v.a*v.b,tri:v.a*v.b/2,aB:deg(Math.atan(v.a/v.b)),aA:deg(Math.atan(v.b/v.a))}),
- out:[['tot','Total length A + B'],['c','Diagonal (slant)'],['rect','A × B'],['tri','Triangle area (A×B÷2)'],['aB','Angle at B end','°'],['aA','Angle at A end','°']],
- draw:(v,r)=>{const sc=Math.min(200/v.b,140/v.a),W=v.b*sc,H=v.a*sc,x=150-W/2,yb=105+H/2,yt=yb-H;
-  return `<polyline points="${x},${yt} ${x},${yb} ${x+W},${yb}" fill="none" stroke="var(--ac)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>`+ln(x,yt,x+W,yb,1.5,'5 4','var(--mu)')+`<polyline points="${x+12},${yb} ${x+12},${yb-12} ${x},${yb-12}" fill="none" stroke="currentColor"/>`+
-  tx(x-8,yb-H/2+4,V(v.a),'end')+tx(x+W/2,yb+20,V(v.b))+tx(x+W/2+10,yb-H/2-8,V(r.c),'start','currentColor')+tx(x+W-6,yb-8,f(r.aB)+'°','end','currentColor')+tx(x+16,yb-16,'90°','start','currentColor')}},
-'Offset':{in:[['o','Offset (rise)'],['t','Travel (slant length)'],['e','Fitting take-off (each end)'],['a','Angle (°)']],link:['o','t'],extra:['a'],preset:[30,45,60],def:45,
- calc:(v,l)=>{const s=Math.sin(rad(v.a)),o=l==='t'?v.t*s:v.o,e=v.e||0,t=o/s;return{o,t,cut:t-2*e,run:o/Math.tan(rad(v.a))}},
- out:[['cut','Cut pipe length'],['run','Run (straight distance)']],
- draw:(v,r)=>{const sc=Math.min(190/r.run,130/r.o),W=r.run*sc,H=r.o*sc,x=150-W/2,yb=105+H/2;
-  return ln(x,yb,x+W,yb,1.5,'5 4','var(--mu)')+ln(x+W,yb,x+W,yb-H,1.5,'5 4','var(--mu)')+ln(x,yb,x+W,yb-H,6,'','var(--ac)')+
-  tx(x+W/2,yb+20,'Run '+V(r.run))+tx(x+W-8,yb-H/2+4,'Offset '+V(r.o),'end')+tx(x+W/2-8,yb-H/2-8,'Travel '+V(r.t),'end','currentColor')+tx(x+32,yb-6,v.a+'°','start','currentColor')},
- note:'Travel = Offset ÷ sin(angle), Run = Offset ÷ tan(angle)'},
-'Bend':{in:[['r','Centerline radius R'],['a','Bend angle (°)'],['d','Pipe OD']],req:['r','a'],preset:[30,45,60,90],def:90,
- calc:v=>{const R=v.r,a=v.a,d=v.d||0;return{arc:rad(a)*R,tan:R*Math.tan(rad(a/2)),ch:2*R*Math.sin(rad(a/2)),outer:rad(a)*(R+d/2),inner:rad(a)*(R-d/2)}},
- out:[['arc','Arc length (centerline)'],['outer','Outer arc'],['inner','Inner arc'],['tan','Tangent length'],['ch','Chord length']],
- draw:(v,r)=>{const cx=50,cy=195,R=110,t=rad(v.a),ex=cx+R*Math.cos(t),ey=cy-R*Math.sin(t),m=t/2,mx=cx+(R+14)*Math.cos(m),my=cy-(R+14)*Math.sin(m);
-  return `<path d="M${cx+R} ${cy} A${R} ${R} 0 ${v.a>180?1:0} 0 ${ex} ${ey}" fill="none" stroke="var(--ac)" stroke-width="6" stroke-linecap="round"/>`+ln(cx,cy,cx+R,cy,1.5,'5 4','var(--mu)')+ln(cx,cy,ex,ey,1.5,'5 4','var(--mu)')+
-  tx(cx+R/2,cy+17,'R '+V(v.r),'middle','currentColor')+tx(cx+30,cy-10,v.a+'°','start','currentColor')+tx(mx,my,'Arc '+V(r.arc),'start')}},
-'Round':{in:[['d','Diameter'],['r','Radius'],['c','Circumference'],['a','Area']],link:['d','r','c','a'],
- calc:(v,l)=>{const d=l==='r'?2*v.r:l==='c'?v.c/PI:l==='a'?2*Math.sqrt(v.a/PI):v.d;return{d,r:d/2,c:PI*d,a:PI*d*d/4,sq:d/S2}},
- out:[['sq','Biggest square inside']],
- draw:(v,r)=>`<circle cx="150" cy="95" r="75" fill="none" stroke="var(--ac)" stroke-width="6"/>`+ln(75,95,225,95,1.5,'5 4','var(--mu)')+ln(150,95,150,20,1.5,'5 4','var(--mu)')+
-  tx(150,115,'Ø '+V(r.d))+tx(156,62,'R '+V(r.r),'start','currentColor')+tx(150,194,'Circumference '+V(r.c),'middle','currentColor')+tx(150,212,'Area '+f(r.a)+' '+U()+'²','middle','currentColor')},
-'Square':{in:[['s','Side'],['g','Diagonal'],['p','Perimeter'],['a','Area']],link:['s','g','p','a'],
- calc:(v,l)=>{const s=l==='g'?v.g/S2:l==='p'?v.p/4:l==='a'?Math.sqrt(v.a):v.s;return{s,g:s*S2,p:4*s,a:s*s,c:s*S2}},
- out:[['c','Circle outside square (dia)'],['s','Circle inside square (dia)']],
- draw:(v,r)=>{const x=100,y=35,S=110;return `<rect x="${x}" y="${y}" width="${S}" height="${S}" fill="none" stroke="var(--ac)" stroke-width="6" stroke-linejoin="round"/>`+ln(x,y,x+S,y+S,1.5,'5 4','var(--mu)')+
-  tx(x+S/2,y-8,V(r.s))+tx(x+S/2,y+S+19,V(r.s))+tx(x-8,y+S/2+4,V(r.s),'end')+tx(x+S+8,y+S/2+4,V(r.s),'start')+tx(x+S/2+8,y+S/2-14,V(r.g),'start','currentColor')+
-  tx(150,198,'Perimeter '+V(r.p),'middle','currentColor')+tx(150,214,'Area '+f(r.a)+' '+U()+'²','middle','currentColor')}},
-'Sq→Round':{in:[['s','Square side'],['d','Round diameter'],['h','Height']],req:['s','d','h'],
- calc:v=>{const r=v.d/2;return{corner:Math.hypot(v.h,v.s/S2-r),mid:Math.hypot(v.h,v.s/2-r),q:PI*v.d/4,c:PI*v.d,p:4*v.s}},
- out:[['corner','Corner edge length'],['mid','Mid-side edge length'],['q','Round quarter arc'],['c','Round circumference'],['p','Square perimeter']],
- draw:(v,r)=>{const sc=150/Math.max(v.s,v.d),S=v.s*sc,D=v.d*sc,cx=150,cy=100,k=D/2*0.7071,sx=cx+S/2,sy=cy-S/2;
-  return `<rect x="${cx-S/2}" y="${cy-S/2}" width="${S}" height="${S}" fill="none" stroke="var(--ac)" stroke-width="5"/><circle cx="${cx}" cy="${cy}" r="${D/2}" fill="none" stroke="currentColor" stroke-width="3"/>`+
-  ln(sx,sy,cx+k,cy-k,2,'4 3','var(--ok)')+ln(sx,cy,cx+D/2,cy,2,'4 3','var(--ok)')+ln(cx-D/2,cy,cx+D/2,cy,1,'4 3','var(--mu)')+
-  tx(cx,cy-S/2-8,'Square '+V(v.s))+tx(cx-D/2+4,cy+16,'Ø '+V(v.d),'start','currentColor')+tx(sx+4,sy-6+(cy-k-sy)/2,'Corner '+V(r.corner),'start','var(--ok)')+tx(sx+4,cy+16,'Mid '+V(r.mid),'start','var(--ok)')+tx(150,208,'Height '+V(v.h),'middle','currentColor')}}
-};
-let tab='L 90°',vals={},last='';
-function nums(){const o={};T[tab].in.forEach(([k])=>o[k]=parseFloat(vals[tab+k]));return o}
-function build(){
- tabs.innerHTML='';Object.keys(T).forEach(n=>{const b=document.createElement('button');b.textContent=n;b.className=n===tab?'on':'';b.onclick=()=>{tab=n;last='';build()};tabs.appendChild(b)});
- const t=T[tab];if(t.def&&vals[tab+'a']===undefined)vals[tab+'a']=t.def;
- inputs.innerHTML=t.in.map(([k,l])=>`<label>${l}</label><input id="i_${k}" type="number" inputmode="decimal" value="${vals[tab+k]??''}">`).join('');
- if(t.preset){const c=document.createElement('div');c.className='chips';t.preset.forEach(p=>{const b=document.createElement('button');b.textContent=p+'°';b.onclick=()=>{vals[tab+'a']=p;document.getElementById('i_a').value=p;run()};c.appendChild(b)});inputs.appendChild(c)}
- t.in.forEach(([k])=>document.getElementById('i_'+k).oninput=e=>{vals[tab+k]=e.target.value;last=k;run()});
- note.textContent=t.note||'Ella measurement um same unit la podunga.';
- run();
-}
-function run(){
- const t=T[tab],v=nums(),need=last&&t.link&&t.link.includes(last)?last:t.in[0][0];
- const keys=t.link?[need,...(t.extra||[])]:t.req;
- if(!keys.every(k=>!isNaN(v[k])&&v[k]>0)){results.innerHTML='<div class="row"><span>Value podunga</span><b>—</b></div>';draw.style.display='none';return}
- const r=t.calc(v,need);
- if(t.link)t.link.forEach(k=>{if(k!==need&&k in r){vals[tab+k]=+r[k].toFixed(3);document.getElementById('i_'+k).value=vals[tab+k]}});
- results.innerHTML=t.out.map(([k,l,s])=>`<div class="row"><span>${l}</span><b>${f(r[k])}${s||''}</b></div>`).join('');
- draw.innerHTML=wrap(t.draw(v,r));draw.style.display='block';
-}
-unit.oninput=run;
-build();
+  // Navigation Tabs
+  function switchTool(id) {
+    document.querySelectorAll('.tool-page').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+    if(id !== 'camTool') stopCamera();
+  }
+
+  function switchShape(id) {
+    document.querySelectorAll('.shape-calc').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.s-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+    document.getElementById('resultCard').style.display = 'none';
+  }
+
+  // UNIT CONVERSION ENGINE (Base = Millimeters)
+  const toMM = { 'mm': 1, 'cm': 10, 'm': 1000, 'inch': 25.4, 'feet': 304.8 };
+
+  function renderOutput(lengthMM, areaMM2 = null) {
+    let card = document.getElementById('resultCard');
+    let body = document.getElementById('resBody');
+    body.innerHTML = '';
+
+    if (lengthMM !== null) {
+      let ft = lengthMM / toMM.feet;
+      let inc = lengthMM / toMM.inch;
+      let mm = lengthMM;
+      let cm = lengthMM / toMM.cm;
+      let m = lengthMM / toMM.m;
+
+      body.innerHTML += `
+        <div class="res-item"><span>நீளம் (Feet):</span><span class="res-val">${ft.toFixed(3)} ft (${Math.floor(ft)}' ${(inc%12).toFixed(1)}")</span></div>
+        <div class="res-item"><span>நீளம் (Inches):</span><span class="res-val">${inc.toFixed(2)} in</span></div>
+        <div class="res-item"><span>நீளம் (mm):</span><span class="res-val">${mm.toFixed(1)} mm</span></div>
+        <div class="res-item"><span>நீளம் (cm):</span><span class="res-val">${cm.toFixed(1)} cm</span></div>
+        <div class="res-item"><span>நீளம் (Meter):</span><span class="res-val">${m.toFixed(3)} m</span></div>
+      `;
+    }
+
+    if (areaMM2 !== null) {
+      let sqFt = areaMM2 / (304.8 * 304.8);
+      let sqM = areaMM2 / (1000 * 1000);
+      let sqInc = areaMM2 / (25.4 * 25.4);
+      let sqCm = areaMM2 / 100;
+
+      body.innerHTML += `
+        <div style="margin:8px 0; border-top:1px dashed #334155;"></div>
+        <div class="res-item"><span>பரப்பளவு (Sq Feet):</span><span class="res-val">${sqFt.toFixed(3)} sq.ft</span></div>
+        <div class="res-item"><span>பரப்பளவு (Sq Meter):</span><span class="res-val">${sqM.toFixed(3)} sq.m</span></div>
+        <div class="res-item"><span>பரப்பளவு (Sq Inch):</span><span class="res-val">${sqInc.toFixed(2)} sq.in</span></div>
+        <div class="res-item"><span>பரப்பளவு (Sq cm):</span><span class="res-val">${sqCm.toFixed(1)} sq.cm</span></div>
+      `;
+    }
+    card.style.display = 'block';
+  }
+
+  // 1. 90 Deg Calculation
+  function run90() {
+    let b = parseFloat(document.getElementById('base90').value);
+    let h = parseFloat(document.getElementById('h90').value);
+    let ub = document.getElementById('uBase90').value;
+    let uh = document.getElementById('uH90').value;
+    if(!b || !h) return alert('அளவுகளை உள்ளிடவும்');
+
+    let bMM = b * toMM[ub];
+    let hMM = h * toMM[uh];
+    let diagMM = Math.sqrt((bMM * bMM) + (hMM * hMM));
+    let areaMM2 = 0.5 * bMM * hMM;
+    renderOutput(diagMM, areaMM2);
+  }
+
+  // 2. 45 Deg Calculation
+  function run45() {
+    let s = parseFloat(document.getElementById('side45').value);
+    let u = document.getElementById('u45').value;
+    if(!s) return alert('அளவை உள்ளிடவும்');
+
+    let sMM = s * toMM[u];
+    let travelMM = sMM * 1.41421356;
+    renderOutput(travelMM, null);
+  }
+
+  // 3. Round
+  function runRound() {
+    let d = parseFloat(document.getElementById('diaR').value);
+    let u = document.getElementById('uDia').value;
+    if(!d) return alert('விட்டம் உள்ளிடவும்');
+
+    let dMM = d * toMM[u];
+    let rMM = dMM / 2;
+    let circMM = Math.PI * dMM;
+    let areaMM2 = Math.PI * rMM * rMM;
+    renderOutput(circMM, areaMM2);
+  }
+
+  // 4. Square
+  function runSquare() {
+    let s = parseFloat(document.getElementById('sideSq').value);
+    let u = document.getElementById('uSq').value;
+    if(!s) return alert('அளவை உள்ளிடவும்');
+
+    let sMM = s * toMM[u];
+    let diagMM = sMM * 1.41421356;
+    let areaMM2 = sMM * sMM;
+    renderOutput(diagMM, areaMM2);
+  }
+
+  // TOOL 2: SPIRIT LEVEL ENGINE (Orientation API)
+  function requestSensors() {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission().then(state => {
+        if (state === 'granted') window.addEventListener('deviceorientation', handleOrientation);
+      });
+    } else {
+      window.addEventListener('deviceorientation', handleOrientation);
+    }
+  }
+
+  function handleOrientation(e) {
+    let x = e.gamma || 0; // Left-Right [-90, 90]
+    let y = e.beta || 0;  // Front-Back [-180, 180]
+
+    let maxMove = 90;
+    let posX = Math.max(-maxMove, Math.min(maxMove, x * 2));
+    let posY = Math.max(-maxMove, Math.min(maxMove, y * 2));
+
+    let bubble = document.getElementById('levelBubble');
+    bubble.style.transform = `translate(${posX}px, ${posY}px)`;
+
+    let isLevel = Math.abs(x) < 1.0 && Math.abs(y) < 1.0;
+    if (isLevel) {
+      bubble.classList.add('level');
+    } else {
+      bubble.classList.remove('level');
+    }
+
+    document.getElementById('levelRead').innerText = `X: ${x.toFixed(1)}° | Y: ${y.toFixed(1)}°`;
+  }
+
+  // TOOL 3: CAMERA STREAM ENGINE
+  let streamRef = null;
+  async function startCamera() {
+    try {
+      const constraints = { video: { facingMode: { ideal: "environment" } } };
+      streamRef = await navigator.mediaDevices.getUserMedia(constraints);
+      document.getElementById('videoFeed').srcObject = streamRef;
+    } catch (err) {
+      alert("கேமரா அனுமதி கிடைக்கவில்லை: " + err.message);
+    }
+  }
+
+  function stopCamera() {
+    if (streamRef) {
+      streamRef.getTracks().forEach(t => t.stop());
+      streamRef = null;
+    }
+  }
 </script>
+
 </body>
 </html>
